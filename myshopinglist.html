@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        input {
+            padding: 8px;
+            width: 300px;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin-left: 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+        }
+
+        .purchased {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>{{ title }}</h1>
+
+        <!-- Input to add items -->
+        <input 
+            v-model="newItem" 
+            type="text" 
+            placeholder="Add item..."
+        >
+        <button @click="addItem" :disabled="newItem === ''">Add</button>
+
+        <!-- Show message if list is empty -->
+        <p v-if="items.length === 0">No items in your list.</p>
+
+        <!-- Show list if items exist -->
+        <ul v-else>
+            <li 
+                v-for="(item, index) in items" 
+                :key="index"
+                :class="{ purchased: item.isPurchased }"
+                @click="togglePurchased(index)"
+            >
+                {{ item.name }}
+                <button @click.stop="deleteItem(index)">Delete</button>
+            </li>
+        </ul>
+
+        <!-- Stats -->
+        <div v-if="items.length > 0">
+            <p>Total: {{ totalItems }} | Purchased: {{ purchasedCount }}</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    title: 'My Shopping List',
+                    newItem: '',
+                    items: []
+                }
+            },
+            methods: {
+                addItem() {
+                    if (this.newItem.trim() !== '') {
+                        this.items.push({
+                            name: this.newItem,
+                            isPurchased: false
+                        });
+                        this.newItem = '';
+                    }
+                },
+                deleteItem(index) {
+                    this.items.splice(index, 1);
+                },
+                togglePurchased(index) {
+                    this.items[index].isPurchased = !this.items[index].isPurchased;
+                }
+            },
+            computed: {
+                totalItems() {
+                    return this.items.length;
+                },
+                purchasedCount() {
+                    return this.items.filter(item => item.isPurchased).length;
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
